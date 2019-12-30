@@ -29,7 +29,7 @@ export function changeXRight(moveUp,moveLeft) {
     const posXChange = Time.setInterval(function () {
         X = X + 5;
         Patches.setScalarValue('posX', X);
-    }, 200);
+    }, 50);
     moveUp.monitor().subscribe(function () {
         if(moveUp.pinLastValue()){
             Time.clearInterval(posXChange);
@@ -45,7 +45,7 @@ export function changeXLeft(moveUp,moveRight) {
     const posXChange = Time.setInterval(function () {
         X = X - 5;
         Patches.setScalarValue('posX', X);
-    }, 200);
+    }, 50);
     moveUp.monitor().subscribe(function () {
         if(moveUp.pinLastValue()){
             Time.clearInterval(posXChange);
@@ -61,7 +61,7 @@ export function changeY(moveLeft,moveRight) {
     const posYChange = Time.setInterval(function () {
         Y = Y + 5;
         Patches.setScalarValue('posY', Y);
-    }, 200);
+    }, 50);
 
     moveRight.monitor().subscribe(function () {
         if(moveRight.pinLastValue()){
@@ -75,8 +75,16 @@ export function changeY(moveLeft,moveRight) {
     });
 }
 
-export function CollideFishBone() {
-
+export function startTime(time, timeNumber) {
+    Patches.setBooleanValue("timeUp",false);
+    let tm = Time.setInterval(function(){
+      timeNumber--;
+      time.text = timeNumber.toString();
+      if(timeNumber < 0) {
+        Time.clearInterval(tm);
+        Patches.setBooleanValue("timeUp",true);
+      }
+    },1000);
 }
 // ------------------------- //
 
