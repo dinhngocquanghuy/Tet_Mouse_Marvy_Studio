@@ -18,86 +18,69 @@ const Time = require('Time');
 const Patches = require('Patches');
 
 // ------------------------- //
+const {
+  changeXLeft,changeXRight,changeY, startTime
+} = require("./function.js");
 
-var X = 0;
-var Y = -250;
 const moveLeft = Patches.getBooleanValue('moveLeft');
 const moveRight = Patches.getBooleanValue('moveRight');
 const moveUp = Patches.getBooleanValue('moveUp');
+var time = Scene.root.find("time");
+var count = Scene.root.find("count");
+var tapScreen = Patches.getBooleanValue("tapScreen");
+var collideWithBone = Patches.getBooleanValue("collideWithBone");
 
 // ------------------------- //
 
-Patches.setScalarValue('posX', X);
-Patches.setScalarValue('posY', Y);
+// Handle Tap Screen Start Game
+var countNumber = 3;
+Patches.setBooleanValue("isTap", true);
+tapScreen.monitor().subscribe(function(){
+  Patches.setBooleanValue("isTap", false);
+  let t = Time.setInterval(function(){
+    --countNumber;
+    count.text = countNumber.toString();
+    if(countNumber < 0) {
+      count.text = "";
+      Patches.setBooleanValue("startGame",true);
+      Time.clearInterval(t);
+    }
+  },1000);
 
-// ------------------------- //
-
-function changeXRight() {
-    const posXChange = Time.setInterval(function () {
-        X = X + 5;
-        Patches.setScalarValue('posX', X);
-    }, 200);
+  Time.setTimeout(function(){
+    // Handle Mouse Movement
     moveUp.monitor().subscribe(function () {
         if(moveUp.pinLastValue()){
-            Time.clearInterval(posXChange);
+            changeY(moveLeft,moveRight);
+        }
+
+    });
+    moveRight.monitor().subscribe(function () {
+        if(moveRight.pinLastValue()){
+            changeXRight(moveUp,moveLeft);
         }
     });
     moveLeft.monitor().subscribe(function () {
         if(moveLeft.pinLastValue()){
-            Time.clearInterval(posXChange);
+            changeXLeft(moveUp,moveRight);
         }
     });
-}
-function changeXLeft() {
-    const posXChange = Time.setInterval(function () {
-        X = X - 5;
-        Patches.setScalarValue('posX', X);
-    }, 200);
-    moveUp.monitor().subscribe(function () {
-        if(moveUp.pinLastValue()){
-            Time.clearInterval(posXChange);
-        }
-    });
-    moveRight.monitor().subscribe(function () {
-        if(moveRight.pinLastValue()){
-            Time.clearInterval(posXChange);
-        }
-    });
-}
-function changeY() {
-    const posYChange = Time.setInterval(function () {
-        Y = Y + 5;
-        Patches.setScalarValue('posY', Y);
-    }, 200);
-
-    moveRight.monitor().subscribe(function () {
-        if(moveRight.pinLastValue()){
-            Time.clearInterval(posYChange);
-        }
-    });
-    moveLeft.monitor().subscribe(function () {
-        if(moveLeft.pinLastValue()){
-            Time.clearInterval(posYChange);
-        }
-    });
-}
-
-// ------------------------- //
-
-
-moveUp.monitor().subscribe(function () {
-    if(moveUp.pinLastValue()){
-        changeY();
-    }
-
+  },3000);
 });
-moveRight.monitor().subscribe(function () {
-    if(moveRight.pinLastValue()){
-        changeXRight();
-    }
-});
-moveLeft.monitor().subscribe(function () {
-    if(moveLeft.pinLastValue()){
-        changeXLeft();
-    }
+
+// Handle Time Count Down
+var timeNumber = 55;
+var t = Time.setInterval(function(){
+  if(countNumber < 0) {
+    startTime(time,timeNumber);
+    Time.clearInterval(t);
+  }
+},1);
+
+// Handle Decrease Life When collideWithBone
+var life_count = 3;
+Patches.setScalarValue("life_count",life_count);
+collideWithBone.monitor().subscribe(function(){
+  life_count = life_count - 1;
+  Patches.setScalarValue("life_count", life_count);
 });
