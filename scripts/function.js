@@ -13,6 +13,8 @@
 
 // How to load in modules
 const Scene = require('Scene');
+const Patches = require('Patches');
+const Time = require('Time');
 const Materials = require('Materials');
 const Textures = require('Textures');
 const TouchGestures = require('TouchGestures');
@@ -20,6 +22,75 @@ const Random = require('Random');
 
 // Use export keyword to make a symbol available in scripting debug console
 export const Diagnostics = require('Diagnostics');
+
+var X = 0;
+var Y = -250;
+Patches.setScalarValue('posX', X);
+Patches.setScalarValue('posY', Y);
+// ------------------------- //
+
+export function changeXRight(moveUp,moveLeft) {
+    const posXChange = Time.setInterval(function () {
+        X = X + 5;
+        Patches.setScalarValue('posX', X);
+    }, 50);
+    moveUp.monitor().subscribe(function () {
+        if(moveUp.pinLastValue()){
+            Time.clearInterval(posXChange);
+        }
+    });
+    moveLeft.monitor().subscribe(function () {
+        if(moveLeft.pinLastValue()){
+            Time.clearInterval(posXChange);
+        }
+    });
+}
+export function changeXLeft(moveUp,moveRight) {
+    const posXChange = Time.setInterval(function () {
+        X = X - 5;
+        Patches.setScalarValue('posX', X);
+    }, 50);
+    moveUp.monitor().subscribe(function () {
+        if(moveUp.pinLastValue()){
+            Time.clearInterval(posXChange);
+        }
+    });
+    moveRight.monitor().subscribe(function () {
+        if(moveRight.pinLastValue()){
+            Time.clearInterval(posXChange);
+        }
+    });
+}
+export function changeY(moveLeft,moveRight) {
+    const posYChange = Time.setInterval(function () {
+        Y = Y + 5;
+        Patches.setScalarValue('posY', Y);
+    }, 50);
+
+    moveRight.monitor().subscribe(function () {
+        if(moveRight.pinLastValue()){
+            Time.clearInterval(posYChange);
+        }
+    });
+    moveLeft.monitor().subscribe(function () {
+        if(moveLeft.pinLastValue()){
+            Time.clearInterval(posYChange);
+        }
+    });
+}
+
+export function startTime(time, timeNumber) {
+    Patches.setBooleanValue("timeUp",false);
+    let tm = Time.setInterval(function(){
+      timeNumber--;
+      time.text = timeNumber.toString();
+      if(timeNumber < 0) {
+        Time.clearInterval(tm);
+        Patches.setBooleanValue("timeUp",true);
+      }
+    },1000);
+}
+// ------------------------- //
 
 //function random item from cat thinking.
 function catDream(){
@@ -40,7 +111,7 @@ function catDream(){
 
 	Diagnostics.log(item);
 
-	//Loop assigned item for array length. 
+	//Loop assigned item for array length.
 	for (var i = 1, o = 6; i <= item; i++, o--) {
 		//Check if o == 0 : +1.
 		if(o == 0){
@@ -81,8 +152,6 @@ function compareResult(itemGet, itemPost){
 }
 
 compareResult(catDream(), itemPost);
-
-
 // To use variables and functions across files, use export/import keyword
 // export const animationDuration = 10;
 
