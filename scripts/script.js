@@ -28,27 +28,9 @@ const moveUp = Patches.getBooleanValue('moveUp');
 var time = Scene.root.find("time");
 var count = Scene.root.find("count");
 var tapScreen = Patches.getBooleanValue("tapScreen");
+var collideWithBone = Patches.getBooleanValue("collideWithBone");
 
 // ------------------------- //
-
-
-// Handle Mouse Movement
-moveUp.monitor().subscribe(function () {
-    if(moveUp.pinLastValue()){
-        changeY(moveLeft,moveRight);
-    }
-
-});
-moveRight.monitor().subscribe(function () {
-    if(moveRight.pinLastValue()){
-        changeXRight(moveUp,moveLeft);
-    }
-});
-moveLeft.monitor().subscribe(function () {
-    if(moveLeft.pinLastValue()){
-        changeXLeft(moveUp,moveRight);
-    }
-});
 
 // Handle Tap Screen Start Game
 var countNumber = 3;
@@ -64,13 +46,41 @@ tapScreen.monitor().subscribe(function(){
       Time.clearInterval(t);
     }
   },1000);
+
+  Time.setTimeout(function(){
+    // Handle Mouse Movement
+    moveUp.monitor().subscribe(function () {
+        if(moveUp.pinLastValue()){
+            changeY(moveLeft,moveRight);
+        }
+
+    });
+    moveRight.monitor().subscribe(function () {
+        if(moveRight.pinLastValue()){
+            changeXRight(moveUp,moveLeft);
+        }
+    });
+    moveLeft.monitor().subscribe(function () {
+        if(moveLeft.pinLastValue()){
+            changeXLeft(moveUp,moveRight);
+        }
+    });
+  },3000);
 });
 
 // Handle Time Count Down
-var timeNumber = 1;
+var timeNumber = 55;
 var t = Time.setInterval(function(){
   if(countNumber < 0) {
     startTime(time,timeNumber);
     Time.clearInterval(t);
   }
 },1);
+
+// Handle Decrease Life When collideWithBone
+var life_count = 3;
+Patches.setScalarValue("life_count",life_count);
+collideWithBone.monitor().subscribe(function(){
+  life_count = life_count - 1;
+  Patches.setScalarValue("life_count", life_count);
+});
