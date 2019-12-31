@@ -1,0 +1,58 @@
+function storyScreen(){
+	const storyText = Scene.root.find('storyText');
+	const talk_1 = "Xin chào, ta là mèo!";
+	const talk_2 = "N?u mu?n dám cu?i chu?t du?c ti?n hành.";
+	const talk_3 = "Hãy di thu th?p và mang d?n nh?ng l? v?t mà ta yêu c?u.";
+	const talk_4 = "NHANH LÊN !!!";
+	const mat_storyText = Materials.get('storyText');
+
+	const opac = Animation.samplers.linear(0, 1);
+	const driver = Animation.timeDriver({durationMilliseconds: 1000});
+	mat_storyText.opacity = Animation.animate(driver, opac);
+
+	var timeIntro = 0;
+
+	function story(){
+		Diagnostics.log(timeIntro);
+		if(timeIntro == 2){
+			storyText.text = talk_1;
+			driver.start();
+			timeIntro++;
+		}else{
+			timeIntro++;
+		}
+
+		if (timeIntro == 4) {
+			driver.reverse();
+		}
+
+		if(timeIntro == 6){
+			storyText.text = talk_2;
+			driver.start();
+		}
+
+		if(timeIntro == 8){
+			driver.reverse();
+		}
+
+		if(timeIntro == 10){
+			storyText.text = talk_3;
+			driver.start();
+		}
+
+		if(timeIntro == 12){
+			driver.reverse();
+		}
+
+		if(timeIntro == 14){
+			storyText.text = talk_4;
+			driver.start();
+		}
+
+		if(timeIntro == 16){
+			driver.reverse();
+		}
+	}
+
+	const intervalTimer = Time.setInterval(story, 1000);
+}
